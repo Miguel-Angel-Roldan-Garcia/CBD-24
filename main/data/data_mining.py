@@ -3,7 +3,6 @@ import csv
 import os
 import ast
 import pickle
-import random
 import time
 
 from collections import namedtuple
@@ -13,9 +12,8 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
-from scipy.sparse import csr_matrix
 
-from main.data.data_utils import clean_text, decode_genres, encode_genres
+from main.data.data_utils import clean_text
 
 dataset_folder = os.path.abspath(os.path.dirname(__file__)) + os.sep + "dataset"
 processed_data_folder = os.path.abspath(os.path.dirname(__file__)) + os.sep + "processedData" 
@@ -184,21 +182,6 @@ def train_tree():
     print("x eval transformed")
     
     # Step 2.3: Train Decision Tree Classifier
-    """
-    Changes made to create each saved tree:
-    -----------------------------------------------------------------
-    0 and 1: defaults
-    2: max_depth = 400, min_samples_split = 200, random_state = 20.
-    3: max_depth = 400, min_samples_split = 200, random_state = 20. Less data of the most common genres
-    4: max_depth = 200, min_samples_split = 200, random_state = 20.
-    5: max_depth = 200, min_samples_split = 1000, random_state = 20.
-    6: max_depth = 200, min_samples_split = 1000, random_state = 20. Even Less data of the most common genres.
-    7: max_depth = 200, min_samples_split = 1000, random_state = 20. All the data. Added stemming. Limiting tf-idf vocabulary to 20k
-    8: Limit tf-idf to 50k
-    9: Removed tf-idf limiting
-    10: max_depth = 100, min_samples_split = 1000, random_state = 20
-    11: max_depth = 50, min_samples_split = 1000, random_state = 20
-    """
     decision_tree = DecisionTreeClassifier(max_depth = 100, min_samples_split = 1000, random_state = 20)
     decision_tree.fit(X_train_tfidf, y_train)
     print("Decision tree trained")
@@ -213,12 +196,13 @@ def train_tree():
     with open(tree_result_file(), "w") as f:
         f.write(classification_report(y_eval, y_pred))
 
+    print(f"Trained tree with version: {int(len(os.listdir(trees_folder))/2)-1}")
     print(f"Time taken to build the tree: {time.time() - start_time}")
 
-def classify(description):
+def classify(description, tree_version):
     clean_description = clean_text(description)
 
-    with open(trees_folder + os.sep + "tree_5.pkl", 'rb') as f:
+    with open(trees_folder + os.sep + "tree_" + str(tree_version) + ".pkl", 'rb') as f:
         tfidf_vectorizer, decision_tree = pickle.load(f)
 
     X_eval_tfidf = tfidf_vectorizer.transform([clean_description])
