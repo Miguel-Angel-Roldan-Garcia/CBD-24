@@ -208,6 +208,6 @@ def classify(description, tree_version):
     X_eval_tfidf = tfidf_vectorizer.transform([clean_description])
 
     y_pred = decision_tree.predict(X_eval_tfidf)
-    return y_pred
+    return y_pred[0]
 
     

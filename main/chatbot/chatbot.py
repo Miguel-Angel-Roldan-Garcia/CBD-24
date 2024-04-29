@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext, END
+from tkinter import scrolledtext
 
 from main.data.data_mining import classify
 
@@ -14,9 +14,8 @@ class MovieChatbot:
         self.welcome_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
         
         # Create chat display
-        self.chat_display = tk.Text(root, width=70, height=20, state="disabled")
+        self.chat_display = scrolledtext.ScrolledText(root, width=70, height=20, state = "disabled")
         self.chat_display.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
-
         
         # Create user input entry
         self.user_input = tk.Entry(root, width=50)
@@ -40,18 +39,18 @@ class MovieChatbot:
         user_message = self.user_input.get().strip()  # Remove leading and trailing whitespace
         if user_message:
             self.chat_display.configure(state='normal')
-            self.chat_display.insert(tk.END, "You: " + user_message + "\n")
+            self.chat_display.insert(tk.END, "You: " + user_message + "\n\n")
             self.user_input.delete(0, tk.END)
             if user_message.lower() == 'bye':
-                self.chat_display.insert(tk.END, "Chatbot: Goodbye!\n")
+                self.chat_display.insert(tk.END, "Chatbot: Goodbye!\n\n")
             else:
                 genre = self.classify_genre(user_message)
-                self.chat_display.insert(tk.END, f"Chatbot: This movie could be categorized as '{genre}'.\n")
+                self.chat_display.insert(tk.END, f"Chatbot: This movie could be categorized as '{genre}'.\n\n")
             self.chat_display.configure(state='disabled')
             self.chat_display.see(tk.END)  # Scroll to the bottom of the chat display
         else:
             # Display a message to the user indicating that the message is empty
-            self.chat_display.insert(tk.END, "[Message cannot be empty]\n")
+            self.chat_display.insert(tk.END, "[Message cannot be empty]\n\n")
             self.chat_display.see(tk.END)  # Scroll to the bottom of the chat display
 
     def send_message_event(self, event):
